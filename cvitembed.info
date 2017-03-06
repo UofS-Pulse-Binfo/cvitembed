@@ -1,6 +1,4 @@
-name = CivitJS Embed
-description = CivitJS Embed
-package = DEV
-version = VERSION
+name = CViTjs Embed
+description = Embeds CViTjs whole-genome diagrams in a Tripal site.
+package = Tripal Extensions
 core = 7.x
-files[] = cvitembed.module

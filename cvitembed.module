@@ -26,9 +26,10 @@
  * Implements hook_menu().
  */
 function cvitembed_menu() {
-  // Pos convert form.
+
+  // Specify the page containing CViTjs diagrams.
   $items['cvitjs'] = array(
-    'title' => t('CViT Plot: Percent of Samples with Heterozygous Calls'),
+    'title' => t('CViTjs whole-genome visualization'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('cvitembed_form'),
     'access arguments' => array('access content'),
@@ -43,6 +44,9 @@ function cvitembed_menu() {
  * Implements hook_theme().
  */
 function cvitembed_theme($existing, $type, $theme, $path) {
+  $items = array();
+
+  // A template to render the "CViT whole-genome diagrams" Form.
   $items['cvitembed_form'] = array(
     'render element' => 'form',
     'template' => 'cvitembed_page',
@@ -57,17 +61,13 @@ function cvitembed_theme($existing, $type, $theme, $path) {
  * Implements hook_libraries_info().
  */
 function cvitembed_libraries_info() {
-  // Paper.js
-  $lib_CViTJS = libraries_get_path('cvitjs');
 
+  // Tell the libraries API about CViTjs
   $libraries['cvitjs'] = array(
     'name' => 'CViTjs',
     'vendor url' => 'https://github.com/awilkey/cvitjs',
     'version' => '0.0.1',
     'download url' => 'https://github.com/awilkey/cvitjs/archive/master.zip',
-    'library path' => $lib_CViTJS,
-    'path' => $lib_CViTJS . '/',
-    'files' => array(),
   );
 
   return $libraries;
@@ -78,10 +78,11 @@ function cvitembed_libraries_info() {
  * Implements hook_form().
  */
 function cvitembed_form($form, &$form_state) {
+
   // Path to module.
-  $cvitjs_mod_path = drupal_get_path('module', 'cvitembed');
+  $module_path = drupal_get_path('module', 'cvitembed');
   // Path to Library.
-  $cvitjs_lib_path = libraries_load('cvitjs')['path'];
+  $cvitjs_lib_path = libraries_get_path('cvitjs') . '/';
   // http://knowpulse.usask.ca/dev/reynold/sites/all/libraries/cvitjs/
   $kp = 'http://' . $_SERVER['SERVER_NAME'] . base_path() . $cvitjs_lib_path;
 
@@ -92,7 +93,7 @@ function cvitembed_form($form, &$form_state) {
     $cvitjs_lib_path . 'js/lib/hopscotch/css/hopscotch.min.css',
     $cvitjs_lib_path . 'css/cvit.css',
     // Override stylesheet.
-    $cvitjs_mod_path . '/theme/css/style.cvitembed.css',
+    $module_path . '/theme/css/style.cvitembed.css',
   );
 
   // AVAILABLE PLOTS.
@@ -235,7 +236,7 @@ function cvitembed_form($form, &$form_state) {
   );
 
   // Add this script when chart is done rendering.
-  drupal_add_js($cvitjs_mod_path . '/theme/js/js.cvitembed.js',
+  drupal_add_js($module_path . '/theme/js/js.cvitembed.js',
     array('scope' => 'footer')
   );
 
