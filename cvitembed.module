@@ -1,0 +1,243 @@
+<?php
+
+/**
+ * @file
+ * The main functionality of this module.
+ */
+
+// NOTE: Add an absolute link to libraries
+//       in: sites/all/libraries/cvitjs/js/require/require-config.js
+//       for variables deps and baseUrl.
+//
+//       deps: ["http://knowpulse.usask.ca/dev/reynold/sites/all/libraries/cvitjs/js/main.js"], //["../../../main"],
+//       baseUrl: 'http://knowpulse.usask.ca/dev/reynold/sites/all/libraries/cvitjs/js/lib', //'js/lib',
+
+//       To make the width of the visualization responsive (upon page load/refresh), added a script to get the width of container div/form
+//       and use it as the width of the canvas.
+//       in: sites/all/libraries/cvitjs/js/cvit.js
+//       canvas container the canvas is contained.
+//       var w = $('#cvitembed-form').width();
+//       $( '#cvit-canvas' ).width( w );
+
+//       Adjusted height (note when adjusting height, css must be updated to use the same height for id #div-overlay-chart-border)
+//       $( '#cvit-canvas' ).height( 600 );
+
+/**
+ * Implements hook_menu().
+ */
+function cvitembed_menu() {
+  // Pos convert form.
+  $items['cvitjs'] = array(
+    'title' => t('CViT Plot: Percent of Samples with Heterozygous Calls'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('cvitembed_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function cvitembed_theme($existing, $type, $theme, $path) {
+  $items['cvitembed_form'] = array(
+    'render element' => 'form',
+    'template' => 'cvitembed_page',
+    'path' => $path . '/theme',
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_libraries_info().
+ */
+function cvitembed_libraries_info() {
+  // Paper.js
+  $lib_CViTJS = libraries_get_path('cvitjs');
+
+  $libraries['cvitjs'] = array(
+    'name' => 'CViTjs',
+    'vendor url' => 'https://github.com/awilkey/cvitjs',
+    'version' => '0.0.1',
+    'download url' => 'https://github.com/awilkey/cvitjs/archive/master.zip',
+    'library path' => $lib_CViTJS,
+    'path' => $lib_CViTJS . '/',
+    'files' => array(),
+  );
+
+  return $libraries;
+}
+
+
+/**
+ * Implements hook_form().
+ */
+function cvitembed_form($form, &$form_state) {
+  // Path to module.
+  $cvitjs_mod_path = drupal_get_path('module', 'cvitembed');
+  // Path to Library.
+  $cvitjs_lib_path = libraries_load('cvitjs')['path'];
+  // http://knowpulse.usask.ca/dev/reynold/sites/all/libraries/cvitjs/
+  $kp = 'http://' . $_SERVER['SERVER_NAME'] . base_path() . $cvitjs_lib_path;
+
+  // ATTACH STYLES.
+  // Stylesheets
+  $form['#attached']['css'] = array(
+    $cvitjs_lib_path . 'js/lib/bootstrap/css/bootstrap.min.css',
+    $cvitjs_lib_path . 'js/lib/hopscotch/css/hopscotch.min.css',
+    $cvitjs_lib_path . 'css/cvit.css',
+    // Override stylesheet.
+    $cvitjs_mod_path . '/theme/css/style.cvitembed.css',
+  );
+
+  // AVAILABLE PLOTS.
+  // Read configuration file.
+  // in: sites/all/libraries/cvitjs/cvit.conf
+  $conf = $cvitjs_lib_path . '/cvit.conf';
+  $m = file($conf);
+
+  $default_plot = '';
+  // Array to hold plots available in config file.
+  // key is the value in ?data=value and value is the human readable string.
+  $arr_plots = array();
+  // Read entries.
+  $f = 0;
+  foreach($m as $v) {
+    // Remove excess white space.
+    $v = trim($v);
+
+    // [data.xxxx] || [general]
+    if($v == '[general]' && $f == 0) {
+      // get next line.
+      $f = 1;
+      continue;
+    }
+
+    if ($f == 1) {
+      // Default plot selected - general in conf file.
+      $default_plot = trim(str_replace(array('data_default', '='), '', $v));
+      $f++;
+    }
+    else {
+      // The rest of the plots.
+      // [xyz...
+      if (preg_match('/\A[\[]/', $v) === 1) {
+        $plot_code = trim(str_replace(array('data', '.', '[', ']'), '', $v));
+      }
+
+      // Human readable title.
+      if (strpos($v, 'title') !== FALSE) {
+        $plot_title = trim(str_replace(array('title', '='), '', $v));
+      }
+
+      // Configuration file.
+      if (strpos($v, 'conf') !== FALSE) {
+        $plot_conf = trim(preg_replace('/conf\s=\s/', '', $v));
+      }
+
+      // Create plot config array.
+      if (!empty($plot_code) && !empty($plot_title)) {
+        $arr_plots[$plot_code] = array(
+          'title' => $plot_title,
+          'conf'  => $plot_conf,
+        );
+
+        unset($plot_code, $plot_title, $plot_conf);
+      }
+    }
+  }
+
+  $form['arr_plots_available'] = array(
+    '#value' => $arr_plots,
+  );
+
+  // Query string in the url.
+  // ?data=xyz
+  $plot = (isset($_GET['data'])) ? $_GET['data'] : $default_plot;
+
+  // Get the title and set it to active/current plot.
+  $form['active_plot'] = array(
+    '#value' => $arr_plots[$plot]['title'],
+  );
+
+
+  // CVIT CANVAS.
+  // Add a script in header section of this document.
+  // note data-main attribute is required and implementing the same with drupal_add_js will not work.
+  $d = array(
+    '#type' => 'markup',
+    '#markup' => '<script data-main="' . $kp . 'js/lib/require/require-config" src="' . $kp . 'js/lib/require/require.js"></script>',
+  );
+
+  drupal_add_html_head($d, 'd');
+
+  // CViT Canvas.
+  $form['cvit_canvas'] = array(
+    '#type' => 'markup',
+    '#markup' =>  '
+      <div id="cvit-div" title="'. $arr_plots[$plot]['title'] .'">
+        <!-- <canvas id="cvit-canvas" style="background-color:#6f6f6f;" resize></canvas> -->
+      </div>'
+  );
+
+  // CVIT LEGEND.
+  // Read configuration of plot requested.
+  $c = $cvitjs_lib_path . $arr_plots[$plot]['conf'];
+  $plot_conf = file_get_contents($c);
+
+  // From the configuration file.
+  // Read Legend values.
+  // Could be percentage values, project name, etc.
+  // Array to hold legend values.
+  $arr_legend = array();
+  // [xyz]
+  $conf_item = preg_split('/\[\w+\]/', $plot_conf);
+  foreach($conf_item as $entry) {
+    if (strpos($entry, 'legend')) {
+      // If legend is true, find value and color.
+      $tmp = explode("\n", $entry);
+
+      if (count($tmp) > 0) {
+        foreach($tmp as $v) {
+          if (!empty($v)) {
+            if (strpos($v, 'color') !== FALSE) {
+              // Legend color.
+              $legend_color = trim(str_replace(array('color', '='), '', $v));
+            }
+
+            if (strpos($v, 'title') !== FALSE) {
+              // Legend value.
+              $legend_value = trim(str_replace(array('title', '='), '', $v));
+            }
+
+            // Store the values.
+            if (!empty($legend_color) && !empty($legend_value)) {
+              $arr_legend[] = array(
+                'colour' => $legend_color,
+                'value'  => $legend_value,
+              );
+
+              unset($legend_color, $legend_value);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  $form['arr_plots_legend'] = array(
+    '#value' => $arr_legend,
+  );
+
+  // Add this script when chart is done rendering.
+  drupal_add_js($cvitjs_mod_path . '/theme/js/js.cvitembed.js',
+    array('scope' => 'footer')
+  );
+
+  return $form;
+}

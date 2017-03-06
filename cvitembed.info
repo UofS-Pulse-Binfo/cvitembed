@@ -1,0 +1,6 @@
+name = CivitJS Embed
+description = CivitJS Embed
+package = DEV
+version = VERSION
+core = 7.x
+files[] = cvitembed.module

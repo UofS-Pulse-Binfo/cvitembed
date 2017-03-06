@@ -1,0 +1,211 @@
+/**
+ * @file
+ * Style cvitembed.
+ */
+
+/* NOTE: civitjs library is using css rules in conflict with KP. */
+
+body {
+  font-size: 100% !important;
+}
+
+.menu-second .menu {
+  font-size: 1.4em !important;
+}
+
+#featured {
+  font-size: 1.1em !important;
+}
+
+#sidebar-second a {
+  font-size: 1.4em !important;
+}
+
+h2 {
+  font-size: 1.5em !important;
+}
+
+#footer p {
+  font-size: 1.3em !important;
+}
+
+#breadcrumb {
+  font-size: 1.4em !important;
+}
+
+.breadcrumb {
+  background: none !important;
+  padding: 0;
+}
+
+#view-list span {
+  font-size: 1.5em !important;
+  font-style: italic;
+}
+
+h1#page-title {
+  font-size: 2.7em !important;
+}
+
+#tour-btn {
+  width: 300px !important;
+}
+
+.modal-body .container {
+  width: 800px !important;
+}
+
+/* End override */
+
+/* Select a plot */
+#select-plots {
+  border-bottom: 1px solid #d6d6d6;
+  font-size: 2em;
+  padding: 15px 15px 15px 15px;
+
+  -moz-box-shadow:    0 5px 7px -9px #333333;
+  -webkit-box-shadow: 0 5px 7px -9px #333333;
+  box-shadow:         0 5px 7px -9px #333333;
+}
+
+#select-plots span {
+  float: right;
+  font-size: 0.8em;
+}
+
+#div-available-plots {
+  background-color: #F7F7F7;
+  display: none;
+  margin: 10px 0 0 0;
+  position: relative;
+  padding: 10px; 35px;
+}
+
+#div-available-plots ul {
+  display: block;
+  list-style-type: none;
+  margin: 0;
+  padding: 0 16px;
+}
+
+#div-available-plots ul li {
+  border-bottom: 1px solid #FFFFFF !important;
+  padding: 10px 0 15px 0 !important;
+}
+
+/* Chart container */
+#div-chart-container {
+  background-color: #F7F7F7;
+  margin: 30px 0 0 0;
+  padding: 30px;
+}
+
+  #div-chart-container .chart-col-left {
+    float: left;
+    position: relative;
+  }
+
+  #div-chart-container .chart-col-right {
+    float: right;
+    padding: 0;
+    margin: 0;
+    width: 160px;
+  }
+
+  #div-chart-container .chart-col-clear {
+    clear: both;
+    height: 1px;
+  }
+
+/* Left Column */
+#div-overlay-chart-border {
+  background-color: none;
+  border: 5px solid #304356;
+  /* Must reflect the height value in cvit.js */
+  height: 600px;
+  pointer-events: none;
+  position: absolute;
+  top: 0; width: 100%;
+}
+
+/* Right Column */
+#list-legend {
+  font-size: 1.5em !important;
+  font-family: sans-serif;
+  font-weight: 300;
+  list-style-type: none;
+  margin: 0;
+}
+
+  #list-legend li {
+    margin: 7px 0;
+    color: #000000;
+  }
+
+  #list-legend li div {
+    border: 1px solid #304356;
+    display: inline;
+    padding: 0 7px;
+
+    -moz-box-shadow:    1px 1px 1px 0px #FFFFFF;
+    -webkit-box-shadow: 1px 1px 1px 0px #FFFFFF;
+    box-shadow:         inset 1px 1px 1px 0px #FFFFFF;
+  }
+
+  #list-legend > li:first-child {
+    font-size: 1.1em;
+    margin-top: 0;
+    text-decoration: underline;
+  }
+
+  #list-legend > li:last-child {
+    border-top: 1px solid #d6d6d6;
+    margin-top: 20px;
+    padding-top: 12px;
+  }
+
+  #list-legend li ul {
+    padding: 0;
+    list-style-type: square;
+    margin: 0 0 0 15px;
+  }
+
+  #list-legend li ul li {
+    color: #118324;
+  }
+
+  #link-show-options, #link-export, #link-help  {
+    text-decoration: none !important;
+  }
+
+
+/* Civit elements */
+.btn-success {
+  background-color: #118324 !important;
+}
+
+.btn-success:hover {
+  background-color: #13b72d !important;
+}
+
+#viewButton, #overlay {
+  visibility: hidden;
+}
+
+#viewButton {
+  display: none;
+}
+
+#view-group {
+  background-color: #FFFFFF;
+  border: 1px solid #adadad;
+}
+
+#menu-group {
+  position: absolute;
+}
+
+.btn-group, .btn-group btn-group-justified, #viewButton {
+  border-radius: 0 !important;
+  -moz-border-radius: 0 !important;
+}
