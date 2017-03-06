@@ -81,10 +81,10 @@ function cvitembed_form($form, &$form_state) {
 
   // Path to module.
   $module_path = drupal_get_path('module', 'cvitembed');
-  // Path to Library.
+  // Relative Path to Library.
   $cvitjs_lib_path = libraries_get_path('cvitjs') . '/';
-  // http://knowpulse.usask.ca/dev/reynold/sites/all/libraries/cvitjs/
-  $kp = 'http://' . $_SERVER['SERVER_NAME'] . base_path() . $cvitjs_lib_path;
+  // Full Path to Library (e.g. http://[yourdrupalsite]/sites/all/libraries/cvitjs/ )
+  $cvitjs_lib_fullpath = 'http://' . $_SERVER['SERVER_NAME'] . base_path() . $cvitjs_lib_path;
 
   // ATTACH STYLES.
   // Stylesheets
@@ -170,9 +170,10 @@ function cvitembed_form($form, &$form_state) {
   // CVIT CANVAS.
   // Add a script in header section of this document.
   // note data-main attribute is required and implementing the same with drupal_add_js will not work.
+  // See https://www.drupal.org/node/1664602
   $d = array(
     '#type' => 'markup',
-    '#markup' => '<script data-main="' . $kp . 'js/lib/require/require-config" src="' . $kp . 'js/lib/require/require.js"></script>',
+    '#markup' => '<script data-main="' . $cvitjs_lib_fullpath . 'js/lib/require/require-config" src="' . $cvitjs_lib_fullpath . 'js/lib/require/require.js"></script>',
   );
 
   drupal_add_html_head($d, 'd');
