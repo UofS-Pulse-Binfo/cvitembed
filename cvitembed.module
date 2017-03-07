@@ -96,6 +96,16 @@ function cvitembed_form($form, &$form_state) {
     $module_path . '/theme/css/style.cvitembed.css',
   );
 
+  // Add a script in header section of this document.
+  // note data-main attribute is required and implementing the same with drupal_add_js will not work.
+  // See https://www.drupal.org/node/1664602
+  $d = array(
+    '#type' => 'markup',
+    '#markup' => '<script data-main="' . $cvitjs_lib_fullpath . 'js/lib/require/require-config" src="' . $cvitjs_lib_fullpath . 'js/lib/require/require.js"></script>',
+  );
+
+  drupal_add_html_head($d, 'd');
+
   // AVAILABLE PLOTS.
   // Read configuration file.
   // in: sites/all/libraries/cvitjs/cvit.conf
@@ -107,50 +117,66 @@ function cvitembed_form($form, &$form_state) {
   // key is the value in ?data=value and value is the human readable string.
   $arr_plots = array();
   // Read entries.
-  $f = 0;
+  $current_stanza = NULL;
   foreach($m as $v) {
     // Remove excess white space.
     $v = trim($v);
 
     // [data.xxxx] || [general]
-    if($v == '[general]' && $f == 0) {
+    if($v == '[general]') {
       // get next line.
-      $f = 1;
+      $current_stanza = 'general';
       continue;
     }
+    // Plot definition.
+    elseif (preg_match('/\[data\.(.*)\]/', $v, $matches)) {
+      $current_stanza = $matches[1];
 
-    if ($f == 1) {
-      // Default plot selected - general in conf file.
-      $default_plot = trim(str_replace(array('data_default', '='), '', $v));
-      $f++;
-    }
-    else {
-      // The rest of the plots.
-      // [xyz...
-      if (preg_match('/\A[\[]/', $v) === 1) {
-        $plot_code = trim(str_replace(array('data', '.', '[', ']'), '', $v));
+      // Ensure there is a title for the last stanza if it was a plot stanza.
+      if (!empty($plot_code) AND !isset($arr_plots[$plot_code]['title'])) {
+        $arr_plots[$plot_code]['title'] = $plot_code;
+
+        tripal_report_error('CViT Embed', TRIPAL_WARNING, 'Unable to detect the title of the %plot plot.', array('%plot' => $plot_code));
+        tripal_set_message(t('Unable to detect the title of the %plot plot. To fix this you should add "title=Your Title" to the definition of this plot in the main cvit.conf.', array('%plot' => $plot_code)), TRIPAL_WARNING);
       }
 
-      // Human readable title.
+      // Initialize the new plot.
+      $plot_code = $matches[1];
+      $arr_plots[$plot_code] = array();
+    }
+    // Unknown stanza
+    elseif (preg_match('/\[(.*)\]/', $v, $matches)) {
+      $current_stanza = $matches[1];
+      $plot_code = NULL;
+    }
+
+    // Default plot selected - general in conf file.
+    if ($current_stanza == 'general' AND preg_match('/default_data/', $v)) {
+      $default_plot = trim(str_replace(array('data_default', '='), '', $v));
+    }
+
+
+    // If we are within a plot stanza...
+    if (!empty($plot_code)) {
+
+      // Human readable title of a plot.
       if (strpos($v, 'title') !== FALSE) {
-        $plot_title = trim(str_replace(array('title', '='), '', $v));
+        $arr_plots[$plot_code]['title'] = trim(str_replace(array('title', '='), '', $v));
       }
 
       // Configuration file.
       if (strpos($v, 'conf') !== FALSE) {
-        $plot_conf = trim(preg_replace('/conf\s=\s/', '', $v));
-      }
-
-      // Create plot config array.
-      if (!empty($plot_code) && !empty($plot_title)) {
-        $arr_plots[$plot_code] = array(
-          'title' => $plot_title,
-          'conf'  => $plot_conf,
-        );
-
-        unset($plot_code, $plot_title, $plot_conf);
+        $arr_plots[$plot_code]['conf'] = trim(preg_replace('/conf\s=\s/', '', $v));
       }
     }
+  }
+
+  // Ensure there is a title for the last stanza if it was a plot stanza.
+  if (!empty($plot_code) AND !isset($arr_plots[$plot_code]['title'])) {
+    $arr_plots[$plot_code]['title'] = $plot_code;
+
+    tripal_report_error('CViT Embed', TRIPAL_WARNING, 'Unable to detect the title of the %plot plot.', array('%plot' => $plot_code));
+    tripal_set_message(t('Unable to detect the title of the %plot plot. To fix this you should add "title=Your Title" to the definition of this plot in the main cvit.conf.', array('%plot' => $plot_code)), TRIPAL_WARNING);
   }
 
   $form['arr_plots_available'] = array(
@@ -166,19 +192,7 @@ function cvitembed_form($form, &$form_state) {
     '#value' => $arr_plots[$plot]['title'],
   );
 
-
   // CVIT CANVAS.
-  // Add a script in header section of this document.
-  // note data-main attribute is required and implementing the same with drupal_add_js will not work.
-  // See https://www.drupal.org/node/1664602
-  $d = array(
-    '#type' => 'markup',
-    '#markup' => '<script data-main="' . $cvitjs_lib_fullpath . 'js/lib/require/require-config" src="' . $cvitjs_lib_fullpath . 'js/lib/require/require.js"></script>',
-  );
-
-  drupal_add_html_head($d, 'd');
-
-  // CViT Canvas.
   $form['cvit_canvas'] = array(
     '#type' => 'markup',
     '#markup' =>  '
