@@ -17,9 +17,9 @@
  $active_plot = $form['active_plot']['#value'];
 ?>
 <div id="select-plots">
-  &#9654; <?php print $active_plot; ?>
+  <span class="title active-plot"><?php print $active_plot; ?></span>
+  <span class="show-plots-link"><a href="#" id="link-available-plots">Available plots</a></span>
 
-  <span><a href="#" id="link-available-plots">Available plots</a></span>
   <div id="div-available-plots">
     <ul>
       <?php
@@ -73,19 +73,15 @@
         else {
           // No legend in configuration file.
           // The options below becomes CViT options.
-          print '<li>CViT Options</li>' . "\n";
+          print '<li>CViTjs Quick Links</li>' . "\n";
         }
-
-        // Show CViT Optinos.
-        // - Show options will show on-chart tools (eg zoom, refresh)
-        // - Export view will export current chart to png file.
-        // - CViT help will launch cvitjs help topics.
       ?>
 
       <li>
         <ul>
-          <li><a id="link-show-options" href="#">Show options</a></li>
+          <!-- Export view will export current chart to png file. -->
           <li><a id="link-export" href="#">Export view</a></li>
+          <!-- CViT help will launch cvitjs help topics. -->
           <li><a id="link-help" href="#">CViT help</a></li>
         </ul>
       </li>

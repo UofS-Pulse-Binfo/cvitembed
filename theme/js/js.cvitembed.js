@@ -27,38 +27,6 @@
         $(this).text(l);
       });
 
-      // Add event listener to show options link.
-      $('#link-show-options').click(function(e) {
-        // Stop default behaviour of a
-        e.preventDefault();
-
-        var c = $(this);
-        var l;
-
-        if (c.text() == 'Show options') {
-          $('#viewButton').show();
-          $('#overlay, #viewButton').css('visibility', 'visible');
-          l = 'Hide options';
-
-          $('#viewButton').click();
-        }
-        else {
-          if ($('#view-group').attr('class') != 'collapse') {
-            $('#viewButton').click();
-          }
-
-          if ($('#menu-group').attr('class') != 'collapse') {
-            $('#menubutton').click();
-          }
-
-          $('#viewButton').hide();
-          $('#overlay, #viewButton').css('visibility', 'hidden');
-          l = 'Show options';
-        }
-
-        c.text(l);
-      });
-
       // Add event listener to Export view link.
       $('#link-export').click(function(e){
         e.preventDefault();
