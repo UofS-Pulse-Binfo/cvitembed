@@ -101,7 +101,7 @@ function cvitembed_form($form, &$form_state) {
   // See https://www.drupal.org/node/1664602
   $d = array(
     '#type' => 'markup',
-    '#markup' => '<script data-main="' . $cvitjs_lib_fullpath . 'js/lib/require/require-config" src="' . $cvitjs_lib_fullpath . 'js/lib/require/require.js"></script>',
+    '#markup' => '<script data-main="' . $module_path . '/theme/js/cvitembed-require.js" src="' . $cvitjs_lib_fullpath . 'js/lib/require/require.js"></script>',
   );
 
   drupal_add_html_head($d, 'd');
