@@ -67,17 +67,6 @@
   height: 1px;
 }
 
-/* Left Column */
-#cvitembed-form #div-overlay-chart-border {
-  background-color: none;
-  border: 1px solid #d0d0d0;
-  /* Must reflect the height value in cvit.js */
-  height: 600px;
-  pointer-events: none;
-  position: absolute;
-  top: 0; width: 100%;
-}
-
 /* Right Column */
 #cvitembed-form #list-legend {
   font-size: 1.5em !important;

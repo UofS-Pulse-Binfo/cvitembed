@@ -48,7 +48,6 @@
        print drupal_render($form['cvit_canvas']);
        // Adds a border to chart to match KP theme.
      ?>
-     <div id="div-overlay-chart-border">&nbsp;</div>
   </div>
 
   <div class="chart-col-right">
