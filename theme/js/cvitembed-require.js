@@ -10,7 +10,11 @@ require.config({
 	// Set baseURL to library path, as recomended by requirejs
 	
 	baseUrl: 'sites/all/libraries/cvitjs/js/lib',
-	
+    
+    // Set error handling if failed to load a module
+
+    catchError: true,
+
 	// Set basic paths to commonly used modules here, makes life easier
 	// when defining them later in other parts of the program
 	// text: require plugin that allows loading of text files as dependencies
@@ -26,7 +30,8 @@ require.config({
 		jquery : 'jquery/jquery-1.12.3.min',
 		mousewheel : 'jquery-mousewheel/jquery.mousewheel.min',
 		paper: 'paper/paper-core.min',
-        hopscotch: 'hopscotch/js/hopscotch.min',
+                hopscotch: 'hopscotch/js/hopscotch.min',
+                bootstrap: 'bootstrap_embed/',
 		cvit: '../cvit',
 		tools:'../cvit/tools/',
 		draw: '../cvit/draw',

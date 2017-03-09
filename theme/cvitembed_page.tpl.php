@@ -42,52 +42,31 @@
 </div>
 
 <div id="div-chart-container">
-  <div class="chart-col-left">
-     <?php
-       // Render CViT canvas.
-       print drupal_render($form['cvit_canvas']);
-       // Adds a border to chart to match KP theme.
-     ?>
-  </div>
 
-  <div class="chart-col-right">
+  <?php
+    // Render CViT canvas.
+    print drupal_render($form['cvit_canvas']);
+  ?>
+
+  <?php
+    // Configuration file has legend information.
+    $legend = $form['arr_plots_legend']['#value'];
+    if(count($legend)) :
+  ?>
+  <div id="legend">
+    <span class="legend-title">Legend:</span>
     <ul id="list-legend">
-      <?php
-        $legend = $form['arr_plots_legend']['#value'];
-        if(count($legend)) {
-          // Configuration file has legend information.
-          print '<li>Legend</li>' . "\n";
 
-          // Construct legend markup.
-          foreach($legend as $l) {
-            // Due to limited horizontal space for long text, lengthy legend text will be trimmed.
-            // Full text is available on title of the field and can be accessed by hovering over the element.
-            $tmp_title = (strlen($l['value']) > 10)
-              ? substr($l['value'], 0, 8) . '...'
-              : $l['value'];
-
-            print '<li title="' . $l['value'] . '"><div style="background-color: ' . $l['colour'] . ';">&nbsp;</div>&nbsp;&nbsp;' . $tmp_title . '</li>';
-          }
-        }
-        else {
-          // No legend in configuration file.
-          // The options below becomes CViT options.
-          print '<li>CViTjs Quick Links</li>' . "\n";
-        }
-      ?>
-
-      <li>
-        <ul>
-          <!-- Export view will export current chart to png file. -->
-          <li><a id="link-export" href="#">Export view</a></li>
-          <!-- CViT help will launch cvitjs help topics. -->
-          <li><a id="link-help" href="#">CViT help</a></li>
-        </ul>
-      </li>
+    <?php
+      // Construct legend markup.
+      foreach($legend as $l) {
+        print '<li title="' . $l['value'] . '"><div style="background-color: ' . $l['colour'] . ';">&nbsp;</div>&nbsp;&nbsp;' . $l['value'] . '</li>';
+      }
+    ?>
     </ul>
   </div>
+  <?php endif; ?>
 
-  <div class="chart-col-clear">&nbsp;</div>
 </div>
 
 <?php

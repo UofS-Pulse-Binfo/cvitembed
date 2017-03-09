@@ -50,35 +50,34 @@
   margin: 30px 0 0 0;
 }
 
-#cvitembed-form #div-chart-container .chart-col-left {
-  float: left;
-  position: relative;
+
+/* Legend */
+
+#cvitembed-form #legend {
+  margin: 10px 15px;
 }
 
-#cvitembed-form #div-chart-container .chart-col-right {
-  float: right;
-  padding: 0;
-  margin: 0;
-  width: 160px;
+#cvitembed-form #legend .legend-title {
+  font-size: 1.1em;
+  font-weight: bold;
+  font-style: underline;
+  padding-right: 10px;
 }
 
-#cvitembed-form #div-chart-container .chart-col-clear {
-  clear: both;
-  height: 1px;
-}
-
-/* Right Column */
 #cvitembed-form #list-legend {
-  font-size: 1.5em !important;
-  font-family: sans-serif;
-  font-weight: 300;
   list-style-type: none;
   margin: 0;
+  padding: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
 }
 
 #cvitembed-form #list-legend li {
   margin: 7px 0;
   color: #000000;
+  padding: 5px;
+  padding-right: 25px;
+  flex-grow: 1;
 }
 
 #cvitembed-form #list-legend li div {
@@ -89,30 +88,4 @@
   -moz-box-shadow:    1px 1px 1px 0px #FFFFFF;
   -webkit-box-shadow: 1px 1px 1px 0px #FFFFFF;
   box-shadow:         inset 1px 1px 1px 0px #FFFFFF;
-}
-
-#cvitembed-form #list-legend > li:first-child {
-  font-size: 1.1em;
-  margin-top: 0;
-  text-decoration: underline;
-}
-
-#cvitembed-form #list-legend > li:last-child {
-  border-top: 1px solid #d6d6d6;
-  margin-top: 20px;
-  padding-top: 12px;
-}
-
-#cvitembed-form #list-legend li ul {
-  padding: 0;
-  list-style-type: square;
-  margin: 0 0 0 15px;
-}
-
-#cvitembed-form #list-legend li ul li {
-  color: #118324;
-}
-
-#cvitembed-form #link-show-options, #link-export, #link-help  {
-  text-decoration: none !important;
 }
