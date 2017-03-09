@@ -29,7 +29,7 @@ function cvitembed_menu() {
 
   // Specify the page containing CViTjs diagrams.
   $items['cvitjs'] = array(
-    'title' => t('CViTjs whole-genome visualization'),
+    'title' => t('CViTjs Whole-Genome Visualization'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('cvitembed_form'),
     'access arguments' => array('access content'),
@@ -88,96 +88,23 @@ function cvitembed_form($form, &$form_state) {
 
   // ATTACH STYLES.
   // Stylesheets
-  $form['#attached']['css'] = array(
-    $cvitjs_lib_path . 'js/lib/bootstrap/css/bootstrap.min.css',
-    $cvitjs_lib_path . 'js/lib/hopscotch/css/hopscotch.min.css',
-    $cvitjs_lib_path . 'css/cvit.css',
-    // Override stylesheet.
-    $module_path . '/theme/css/style.cvitembed.css',
-  );
+  $form['#attached']['css'] = array();
+  $form['#attached']['css'][$cvitjs_lib_path . 'js/lib/bootstrap/css/bootstrap.min.css'] = array('group' => CSS_SYSTEM, 'type' => 'file', 'weight' => 999, 'every_page' => TRUE, 'preprocess' => FALSE);
+  $form['#attached']['css'][$cvitjs_lib_path . 'js/lib/hopscotch/css/hopscotch.min.css'] = array( 'preprocess' => TRUE );
+  $form['#attached']['css'][$cvitjs_lib_path . 'css/cvit.css'] = array( 'preprocess' => TRUE );
 
-  // Add a script in header section of this document.
-  // note data-main attribute is required and implementing the same with drupal_add_js will not work.
-  // See https://www.drupal.org/node/1664602
-  $d = array(
-    '#type' => 'markup',
-    '#markup' => '<script data-main="' . $module_path . '/theme/js/cvitembed-require.js" src="' . $cvitjs_lib_fullpath . 'js/lib/require/require.js"></script>',
-  );
+  // Overide CViTjs and apply some of our own theme-ing.  
+  $form['#attached']['css'][] = $module_path . '/theme/css/style.cvitembed.css';
 
-  drupal_add_html_head($d, 'd');
+  // Use RequireJS to add all the dependencies needed by CViTjs.
+  $form['#attached']['js'] = array();
+  $form['#attached']['js'][$cvitjs_lib_fullpath . 'js/lib/require/require.js'] = array('group'=>'JS_LIBRARY','type'=>'file');
+  $form['#attached']['js'][$module_path . '/theme/js/cvitembed-require.js'] = array('group'=>'JS_THEME');
 
   // AVAILABLE PLOTS.
-  // Read configuration file.
   // in: sites/all/libraries/cvitjs/cvit.conf
-  $conf = $cvitjs_lib_path . '/cvit.conf';
-  $m = file($conf);
-
-  $default_plot = '';
-  // Array to hold plots available in config file.
-  // key is the value in ?data=value and value is the human readable string.
-  $arr_plots = array();
-  // Read entries.
-  $current_stanza = NULL;
-  foreach($m as $v) {
-    // Remove excess white space.
-    $v = trim($v);
-
-    // [data.xxxx] || [general]
-    if($v == '[general]') {
-      // get next line.
-      $current_stanza = 'general';
-      continue;
-    }
-    // Plot definition.
-    elseif (preg_match('/\[data\.(.*)\]/', $v, $matches)) {
-      $current_stanza = $matches[1];
-
-      // Ensure there is a title for the last stanza if it was a plot stanza.
-      if (!empty($plot_code) AND !isset($arr_plots[$plot_code]['title'])) {
-        $arr_plots[$plot_code]['title'] = $plot_code;
-
-        tripal_report_error('CViT Embed', TRIPAL_WARNING, 'Unable to detect the title of the %plot plot.', array('%plot' => $plot_code));
-        tripal_set_message(t('Unable to detect the title of the %plot plot. To fix this you should add "title=Your Title" to the definition of this plot in the main cvit.conf.', array('%plot' => $plot_code)), TRIPAL_WARNING);
-      }
-
-      // Initialize the new plot.
-      $plot_code = $matches[1];
-      $arr_plots[$plot_code] = array();
-    }
-    // Unknown stanza
-    elseif (preg_match('/\[(.*)\]/', $v, $matches)) {
-      $current_stanza = $matches[1];
-      $plot_code = NULL;
-    }
-
-    // Default plot selected - general in conf file.
-    if ($current_stanza == 'general' AND preg_match('/default_data/', $v)) {
-      $default_plot = trim(str_replace(array('data_default', '='), '', $v));
-    }
-
-
-    // If we are within a plot stanza...
-    if (!empty($plot_code)) {
-
-      // Human readable title of a plot.
-      if (strpos($v, 'title') !== FALSE) {
-        $arr_plots[$plot_code]['title'] = trim(str_replace(array('title', '='), '', $v));
-      }
-
-      // Configuration file.
-      if (strpos($v, 'conf') !== FALSE) {
-        $arr_plots[$plot_code]['conf'] = trim(preg_replace('/conf\s=\s/', '', $v));
-      }
-    }
-  }
-
-  // Ensure there is a title for the last stanza if it was a plot stanza.
-  if (!empty($plot_code) AND !isset($arr_plots[$plot_code]['title'])) {
-    $arr_plots[$plot_code]['title'] = $plot_code;
-
-    tripal_report_error('CViT Embed', TRIPAL_WARNING, 'Unable to detect the title of the %plot plot.', array('%plot' => $plot_code));
-    tripal_set_message(t('Unable to detect the title of the %plot plot. To fix this you should add "title=Your Title" to the definition of this plot in the main cvit.conf.', array('%plot' => $plot_code)), TRIPAL_WARNING);
-  }
+  $conf_filename = $cvitjs_lib_path . '/cvit.conf';
+  $arr_plots = cvitembed_extract_available_plots($conf_filename);
 
   $form['arr_plots_available'] = array(
     '#value' => $arr_plots,
@@ -256,4 +183,75 @@ function cvitembed_form($form, &$form_state) {
   );
 
   return $form;
+}
+
+/**
+ * Extract the available plots from cvit.conf
+ */
+function cvitembed_extract_available_plots($conf_filename) {
+
+  $m = file($conf_filename);
+
+  $default_plot = '';
+  // Array to hold plots available in config file.
+  // key is the value in ?data=value and value is the human readable string.
+  $arr_plots = array();
+  // Read entries.
+  $current_stanza = NULL;
+  foreach($m as $v) {
+    // Remove excess white space.
+    $v = trim($v);
+
+    // [data.xxxx] || [general]
+    if($v == '[general]') {
+      // get next line.
+      $current_stanza = 'general';
+      continue;
+    }
+    // Plot definition.
+    elseif (preg_match('/\[data\.(.*)\]/', $v, $matches)) {
+      $current_stanza = $matches[1];
+
+      // Ensure there is a title for the last stanza if it was a plot stanza.
+      if (!empty($plot_code) AND !isset($arr_plots[$plot_code]['title'])) {
+        $arr_plots[$plot_code]['title'] = $plot_code;
+      }
+
+      // Initialize the new plot.
+      $plot_code = $matches[1];
+      $arr_plots[$plot_code] = array();
+    }
+    // Unknown stanza
+    elseif (preg_match('/\[(.*)\]/', $v, $matches)) {
+      $current_stanza = $matches[1];
+      $plot_code = NULL;
+    }
+
+    // Default plot selected - general in conf file.
+    if ($current_stanza == 'general' AND preg_match('/default_data/', $v)) {
+      $default_plot = trim(str_replace(array('data_default', '='), '', $v));
+    }
+
+
+    // If we are within a plot stanza...
+    if (!empty($plot_code)) {
+
+      // Human readable title of a plot.
+      if (strpos($v, 'title') !== FALSE) {
+        $arr_plots[$plot_code]['title'] = trim(str_replace(array('title', '='), '', $v));
+      }
+
+      // Configuration file.
+      if (strpos($v, 'conf') !== FALSE) {
+        $arr_plots[$plot_code]['conf'] = trim(preg_replace('/conf\s=\s/', '', $v));
+      }
+    }
+  }
+
+  // Ensure there is a title for the last stanza if it was a plot stanza.
+  if (!empty($plot_code) AND !isset($arr_plots[$plot_code]['title'])) {
+    $arr_plots[$plot_code]['title'] = $plot_code;
+  }
+
+  return $arr_plots;
 }
