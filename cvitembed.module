@@ -30,7 +30,7 @@ function cvitembed_menu() {
   $items['cvitjs'] = array(
     'title' => t('CViTjs Whole-Genome Visualization'),
     'page callback' => 'page_list_available_plots',
-    'access arguments' => array('access content'),
+    'access arguments' => array('view cvitjs plot'),
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -39,7 +39,7 @@ function cvitembed_menu() {
       'title' => $details['title'],
       'page callback' => 'drupal_get_form',
       'page arguments' => array('cvitembed_form', $key, $details['title'], $details),
-      'access arguments' => array('access content'),
+      'access arguments' => array('view cvitjs plot'),
       'type' => MENU_NORMAL_ITEM,
     );
   }
@@ -47,6 +47,16 @@ function cvitembed_menu() {
   return $items;
 }
 
+/**
+ * Implements hook_permission().
+ */
+function cvitembed_permission() {
+  return array(
+    'view cvitjs plot' => array(
+      'title' => t('Access CViTjs plots.'),
+    )
+  );
+}
 
 /**
  * Implements hook_theme().
