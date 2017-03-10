@@ -11,8 +11,10 @@
 
 <div id="div-chart-container" width="1000" class="clearfix">
 
-
-  <h1 class="title active-plot"><?php print $active_plot; ?></h1>
+  <?php
+    // Render plot description.
+    print drupal_render($form['description']);
+  ?>
 
   <?php
     // Render CViT canvas.

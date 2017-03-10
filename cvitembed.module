@@ -90,6 +90,7 @@ function cvitembed_form($form, &$form_state) {
   $active_plot = $form_state['build_info']['args'][0];
   $active_plot_title = $form_state['build_info']['args'][1];
   $active_plot_conf = $form_state['build_info']['args'][2]['conf'];
+  $active_plot_details = $form_state['build_info']['args'][2];
 
   // Path to module.
   $module_path = drupal_get_path('module', 'cvitembed');
@@ -114,6 +115,13 @@ function cvitembed_form($form, &$form_state) {
   // Get the title and set it to active/current plot.
   $form['active_plot'] = array(
     '#value' => $active_plot_title,
+  );
+
+  $form['description'] = array(
+    '#type' => 'markup',
+    '#prefix' => '<p>',
+    '#suffix' => '</p>',
+    '#markup' => $active_plot_details['description'],
   );
 
   // CVIT CANVAS.
@@ -266,6 +274,11 @@ function cvitembed_extract_available_plots($conf_filename, &$default_plot) {
       if (strpos($v, 'conf') !== FALSE) {
         $arr_plots[$plot_code]['conf'] = trim(preg_replace('/conf\s=\s/', '', $v));
       }
+
+      // Description.
+      if (strpos($v, 'description') !== FALSE) {
+        $arr_plots[$plot_code]['description'] = trim(preg_replace('/description\s=\s/', '', $v));
+      }
     }
   }
 
@@ -293,7 +306,7 @@ function page_list_available_plots() {
 
   $output .= '<ul>';
   foreach ($plots as $key => $details) {
-    $output .= '<li>' . l($details['title'], 'cvitjs/'.$key) . '</li>';
+    $output .= '<li>' . l($details['title'], 'cvitjs/'.$key) . ': ' . $details['description'] . '</li>';
   }
   $output .= '</ul>';
 
