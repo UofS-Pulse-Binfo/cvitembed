@@ -134,48 +134,73 @@ function cvitembed_form($form, &$form_state) {
 
   // CVIT LEGEND.
   // Read configuration of plot requested.
-  $c = $cvitjs_lib_path . $active_plot_conf;
-  $plot_conf = file_get_contents($c);
-
   // From the configuration file.
-  // Read Legend values.
+  // Read Legend titles.
   // Could be percentage values, project name, etc.
-  // Array to hold legend values.
+  $conf_filename = $cvitjs_lib_path . $active_plot_conf;
+  $CONF = fopen($conf_filename, "r");
+
+  // Array to hold legend titles.
   $arr_legend = array();
-  // [xyz]
-  $conf_item = preg_split('/\[\w+\]/', $plot_conf);
-  foreach($conf_item as $entry) {
-    if (strpos($entry, 'legend')) {
-      // If legend is true, find value and color.
-      $tmp = explode("\n", $entry);
 
-      if (count($tmp) > 0) {
-        foreach($tmp as $v) {
-          if (!empty($v)) {
-            if (strpos($v, 'color') !== FALSE) {
-              // Legend color.
-              $legend_color = trim(str_replace(array('color', '='), '', $v));
-            }
+  $section = NULL;
+  $is_legend = FALSE;
+  $section_title = NULL;
 
-            if (strpos($v, 'title') !== FALSE) {
-              // Legend value.
-              $legend_value = trim(str_replace(array('title', '='), '', $v));
-            }
+  $conf_filename = $cvitjs_lib_path . $active_plot_conf;
+  $CONF = fopen($conf_filename, "r");
+  if ($CONF) {
+    while (($line = fgets($CONF)) !== false) {
 
-            // Store the values.
-            if (!empty($legend_color) && !empty($legend_value)) {
-              $arr_legend[] = array(
-                'colour' => $legend_color,
-                'value'  => $legend_value,
-              );
+      $line = trim($line);
+      $pair = explode('=', $line);
 
-              unset($legend_color, $legend_value);
-            }
-          }
+      // If the current line is a new section then...
+      if (preg_match('/^\[(.*)\]$/',$line,$matches)) {
+
+        // First save last section.
+        if ($section AND $is_legend) {
+          $arr_legend[] = array(
+            'colour' => $section_color,
+            'value'  => $section_title,
+          );
+        }
+
+        // Then initialize new section.
+        $section = $matches[1];
+        $is_legend = FALSE;
+        $section_title = $matches[1];
+        $section_color = NULL;
+      }
+      // Otherwise, maybe this is a key/value pair?
+      elseif (sizeof($pair) == 2) {
+ 
+        $pair[0] = strtolower(trim($pair[0]));
+        $pair[1] = trim($pair[1]);
+
+        switch($pair[0]) {
+          case 'legend':
+            $is_legend = TRUE;
+            break;
+          case 'title':
+            $section_title = $pair[1];
+            break;
+          case 'color':
+          case 'colour':
+            $section_color = $pair[1];
+            break;
         }
       }
     }
   }
+
+  // Save last section.
+  if ($section AND $is_legend) {
+    $arr_legend[] = array(
+      'colour' => $section_color,
+      'value'  => $section_title,
+    );
+  } 
 
   $form['arr_plots_legend'] = array(
     '#value' => $arr_legend,
