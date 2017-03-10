@@ -3,24 +3,19 @@
 /**
  * @file
  * The main functionality of this module.
- */
+ *
+ * @todo make cvit chart resize:
+ * CViTjs Documentation:
+      To make the width of the visualization responsive (upon page load/refresh), added a script to get the width of container div/form
+      and use it as the width of the canvas.
+      in: sites/all/libraries/cvitjs/js/cvit.js
+      canvas container the canvas is contained.
+      var w = $('#cvitembed-form').width();
+      $( '#cvit-canvas' ).width( w );
 
-// NOTE: Add an absolute link to libraries
-//       in: sites/all/libraries/cvitjs/js/require/require-config.js
-//       for variables deps and baseUrl.
-//
-//       deps: ["http://knowpulse.usask.ca/dev/reynold/sites/all/libraries/cvitjs/js/main.js"], //["../../../main"],
-//       baseUrl: 'http://knowpulse.usask.ca/dev/reynold/sites/all/libraries/cvitjs/js/lib', //'js/lib',
-
-//       To make the width of the visualization responsive (upon page load/refresh), added a script to get the width of container div/form
-//       and use it as the width of the canvas.
-//       in: sites/all/libraries/cvitjs/js/cvit.js
-//       canvas container the canvas is contained.
-//       var w = $('#cvitembed-form').width();
-//       $( '#cvit-canvas' ).width( w );
-
-//       Adjusted height (note when adjusting height, css must be updated to use the same height for id #div-overlay-chart-border)
-//       $( '#cvit-canvas' ).height( 600 );
+      Adjusted height (note when adjusting height, css must be updated to use the same height for id #div-overlay-chart-border)
+      $( '#cvit-canvas' ).height( 600 );
+*/
 
 /**
  * Implements hook_menu().
@@ -34,9 +29,7 @@ function cvitembed_menu() {
   // Specify the page containing CViTjs diagrams.
   $items['cvitjs'] = array(
     'title' => t('CViTjs Whole-Genome Visualization'),
-    'page callback' => 'system_admin_menu_block_page',
-    'file path' => drupal_get_path('module', 'system'),
-    'file' => 'system.admin.inc',
+    'page callback' => 'page_list_available_plots',
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -282,4 +275,28 @@ function cvitembed_extract_available_plots($conf_filename, &$default_plot) {
   }
 
   return $arr_plots;
+}
+
+/**
+ *  Generates the martk-up to list all the available plots.
+ */
+function page_list_available_plots() {
+  $output = '';
+
+  $default_plot = NULL;
+  $conf_filename = libraries_get_path('cvitjs') . '/cvit.conf';
+  $plots = cvitembed_extract_available_plots($conf_filename, $default_plot);
+
+  $output .= '<div class="cvit-listing">';
+  $output .= '<p>CViTjs provides an interactive whole genome diagram and was developed by the Legume Federation.</p>';
+  $output .= '<h1 class="listing-title">Available Charts:</h1>';
+
+  $output .= '<ul>';
+  foreach ($plots as $key => $details) {
+    $output .= '<li>' . l($details['title'], 'cvitjs/'.$key) . '</li>';
+  }
+  $output .= '</ul>';
+
+  $output .= '</div>';
+  return $output;
 }
