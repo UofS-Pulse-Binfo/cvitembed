@@ -2,7 +2,7 @@ Provides a page per CViTjs plot in your Tripal site. This module also supports a
 
 ## Dependencies
 - Tripal v2.x
-- [CViTjs](https://github.com/LegumeFederation/cvitjs)
+- [CViTjs](https://github.com/LegumeFederation/cvitjs) (Commit 857f59fda57f2e891d09bc704e208731e89a5bd0)
 
 ## Installation
 1. Install CViTjs as a Library in [your drupal site]/sites/all/libraries ( [Drupal HowTo](https://www.drupal.org/docs/7/modules/libraries-api/installing-an-external-library-that-is-required-by-a-contributed-module) )
