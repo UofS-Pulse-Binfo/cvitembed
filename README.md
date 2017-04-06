@@ -1,12 +1,16 @@
 Provides a page per CViTjs plot in your Tripal site. This module also supports adding a legend to your diagram pages.
 
 ## Dependencies
+- Tripal v2.x
 - [CViTjs](https://github.com/LegumeFederation/cvitjs)
 
 ## Installation
 1. Install CViTjs as a Library in [your drupal site]/sites/all/libraries ( [Drupal HowTo](https://www.drupal.org/docs/7/modules/libraries-api/installing-an-external-library-that-is-required-by-a-contributed-module) )
-2. Install this module as you would any other Drupal module.
-3. Create your CViTjs diagrams according to the instructions included in the Library.
+2. Install Tripal and this module as you would any other Drupal module.
+
+## Usage
+1. Create your CViTjs diagrams according to the instructions included in the Library.
+2. Clear the Drupal cache. Your diagrams should show up as one diagram per menu item. URLs will be [your drupal site]/cvitjs/[diagram short code].
 
 ## Tips & Tricks
 - Set the title of your CViTjs pages and the labels of the links by adding a `title = Your Human Readable Title` tag in the main cvit.conf for each dataset
