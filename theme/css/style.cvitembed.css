@@ -7,6 +7,11 @@
   padding: 0;
 }
 
+#div-chart-container.cvitjs div.messages.warning {
+  margin-right: 100px;
+  margin-left: 0;
+}
+
 /* Legend */
 #cvitembed-form #legend {
   margin: 10px 15px;

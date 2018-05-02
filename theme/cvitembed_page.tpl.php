@@ -9,14 +9,14 @@
 ?>
 
 
-<div id="div-chart-container" width="1000" class="clearfix">
+<div id="div-chart-container" class="cvitjs" width="1000" class="clearfix">
 
   <?php
     // Render plot description.
     print drupal_render($form['description']);
   ?>
 
-  <div class="messages warning">Please be patient. These plots can be a little slow to draw.</div>
+  <div id="title-div"><div class="messages warning">Please be patient. These plots can be a little slow to draw.</div></div>
 
   <?php
     // Render CViT canvas.
