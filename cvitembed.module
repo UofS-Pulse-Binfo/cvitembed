@@ -35,13 +35,15 @@ function cvitembed_menu() {
   );
 
   foreach ($plots as $key => $details) {
-    $items['cvitjs/'.$key] = array(
-      'title' => $details['title'],
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('cvitembed_form', $key, $details['title'], $details),
-      'access arguments' => array('view cvitjs plot'),
-      'type' => MENU_NORMAL_ITEM,
-    );
+    if (!empty($details['title']) AND !empty($details['description'])) {
+      $items['cvitjs/'.$key] = array(
+        'title' => $details['title'],
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('cvitembed_form', $key, $details['title'], $details),
+        'access arguments' => array('view cvitjs plot'),
+        'type' => MENU_NORMAL_ITEM,
+      );
+    }
   }
 
   return $items;
