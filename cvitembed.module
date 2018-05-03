@@ -35,13 +35,15 @@ function cvitembed_menu() {
   );
 
   foreach ($plots as $key => $details) {
-    $items['cvitjs/'.$key] = array(
-      'title' => $details['title'],
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('cvitembed_form', $key, $details['title'], $details),
-      'access arguments' => array('view cvitjs plot'),
-      'type' => MENU_NORMAL_ITEM,
-    );
+    if (!empty($details['title']) AND !empty($details['description'])) {
+      $items['cvitjs/'.$key] = array(
+        'title' => $details['title'],
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('cvitembed_form', $key, $details['title'], $details),
+        'access arguments' => array('view cvitjs plot'),
+        'type' => MENU_NORMAL_ITEM,
+      );
+    }
   }
 
   return $items;
@@ -185,7 +187,7 @@ function cvitembed_form($form, &$form_state) {
       }
       // Otherwise, maybe this is a key/value pair?
       elseif (sizeof($pair) == 2) {
- 
+
         $pair[0] = strtolower(trim($pair[0]));
         $pair[1] = trim($pair[1]);
 
@@ -211,7 +213,7 @@ function cvitembed_form($form, &$form_state) {
       'colour' => $section_color,
       'value'  => $section_title,
     );
-  } 
+  }
 
   $form['arr_plots_legend'] = array(
     '#value' => $arr_legend,
@@ -316,7 +318,9 @@ function page_list_available_plots() {
 
   $output .= '<ul>';
   foreach ($plots as $key => $details) {
-    $output .= '<li>' . l($details['title'], 'cvitjs/'.$key) . ': ' . $details['description'] . '</li>';
+    if (!empty($details['title']) AND !empty($details['description'])) {
+      $output .= '<li>' . l($details['title'], 'cvitjs/'.$key) . ': ' . $details['description'] . '</li>';
+    }
   }
   $output .= '</ul>';
 
