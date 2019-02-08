@@ -15,4 +15,5 @@ Provides a page per CViTjs plot in your Tripal site. This module also supports a
 ## Tips & Tricks
 - Set the title of your CViTjs pages and the labels of the links by adding a `title = Your Human Readable Title` tag in the main cvit.conf for each dataset
 - You can also add a one-line description above your diagram by adding a `description = More details about the analysis, etc.` tag in the main cvit.conf for each dataset
+- To make a chart private (i.e. controlled by the "View Private CViTjs plot" permission) add `access = private` to the main cvitjs.conf
 - This module will generate a colour-based legend for you. Simply add the following tags in the plot cvit.conf for each visualization type you want in the legend: `legend = true`, `title = My Legend label for this type`. The module will use the colo(u)r already set for the type.
