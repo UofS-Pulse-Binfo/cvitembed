@@ -343,6 +343,7 @@ function page_list_available_plots() {
 
   if (user_access('view private cvitjs plot')) {
     $output .= '<h1 class="listing-title">Private Charts</h1>';
+    $output .= '<p>The following charts have been made available to you based on your account. Please do not share these charts with others as they are meant for internal use.</p>';
     $output .= '<ul>';
     foreach ($plots as $key => $details) {
       if (!empty($details['title']) AND !empty($details['description'])) {
