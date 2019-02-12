@@ -36,11 +36,17 @@ function cvitembed_menu() {
 
   foreach ($plots as $key => $details) {
     if (!empty($details['title']) AND !empty($details['description'])) {
+      if (isset($details['access']) AND ($details['access'] == 'private')) {
+        $perm = 'view private cvitjs plot';
+      }
+      else {
+        $perm = 'view cvitjs plot';
+      }
       $items['cvitjs/'.$key] = array(
         'title' => $details['title'],
         'page callback' => 'drupal_get_form',
         'page arguments' => array('cvitembed_form', $key, $details['title'], $details),
-        'access arguments' => array('view cvitjs plot'),
+        'access arguments' => array($perm),
         'type' => MENU_NORMAL_ITEM,
       );
     }
@@ -55,8 +61,11 @@ function cvitembed_menu() {
 function cvitembed_permission() {
   return array(
     'view cvitjs plot' => array(
-      'title' => t('Access CViTjs plots.'),
-    )
+      'title' => t('Access Public CViTjs plots.'),
+    ),
+    'view private cvitjs plot' => array(
+      'title' => t('Access Private CViTjs plots.'),
+    ),
   );
 }
 
@@ -291,6 +300,11 @@ function cvitembed_extract_available_plots($conf_filename, &$default_plot) {
       if (strpos($v, 'description') !== FALSE) {
         $arr_plots[$plot_code]['description'] = trim(preg_replace('/description\s=\s/', '', $v));
       }
+
+      // Access
+      if (strpos($v, 'access') !== FALSE) {
+        $arr_plots[$plot_code]['access'] = trim(preg_replace('/access\s=\s/', '', $v));
+      }
     }
   }
 
@@ -314,15 +328,34 @@ function page_list_available_plots() {
 
   $output .= '<div class="cvit-listing">';
   $output .= '<p>CViTjs provides an interactive whole genome diagram and was developed by the Legume Federation.</p>';
-  $output .= '<h1 class="listing-title">Available Charts:</h1>';
+  $output .= '<h1 class="listing-title">Public Charts:</h1>';
 
   $output .= '<ul>';
   foreach ($plots as $key => $details) {
     if (!empty($details['title']) AND !empty($details['description'])) {
-      $output .= '<li>' . l($details['title'], 'cvitjs/'.$key) . ': ' . $details['description'] . '</li>';
+      // Only show if it's not private.
+      if (!isset($details['access']) OR ($details['access'] != 'private')) {
+        $output .= '<li>' . l($details['title'], 'cvitjs/'.$key) . ': ' . $details['description'] . '</li>';
+      }
     }
   }
   $output .= '</ul>';
+
+  if (user_access('view private cvitjs plot')) {
+    $output .= '<h1 class="listing-title">Private Charts</h1>';
+    $output .= '<p>The following charts have been made available to you based on your account. Please do not share these charts with others as they are meant for internal use.</p>';
+    $output .= '<ul>';
+    foreach ($plots as $key => $details) {
+      if (!empty($details['title']) AND !empty($details['description'])) {
+        // Only show if it's not private.
+        if (isset($details['access']) AND ($details['access'] == 'private')) {
+          $output .= '<li>' . l($details['title'], 'cvitjs/'.$key) . ': ' . $details['description'] . '</li>';
+        }
+      }
+    }
+    $output .= '</ul>';
+
+  }
 
   $output .= '</div>';
   return $output;
