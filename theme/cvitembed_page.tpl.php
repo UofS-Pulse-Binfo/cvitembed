@@ -16,8 +16,6 @@
     print drupal_render($form['description']);
   ?>
 
-  <div id="title-div"><div class="messages warning">Please be patient. These plots can be a little slow to draw.</div></div>
-
   <?php
     // Render CViT canvas.
     print drupal_render($form['cvit_canvas']);
