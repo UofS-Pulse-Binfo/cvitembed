@@ -1,3 +1,5 @@
+# CViTjs Embed
+
 Provides a page per CViTjs plot in your Tripal site. This module also supports adding a legend to your diagram pages.
 
 ## Dependencies
